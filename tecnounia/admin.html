@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin TECNOUNIA | Panel de Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 20% 30%, #0a0f1f, #050a15);
+            min-height: 100vh;
+            color: #e8e8f0;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-card {
+            background: rgba(10, 18, 34, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-card i {
+            font-size: 70px;
+            background: linear-gradient(135deg, #00e5ff, #f5c542);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .login-card h2 {
+            font-size: 32px;
+            background: linear-gradient(135deg, #ffffff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .login-card p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 60px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: #e8e8f0;
+            outline: none;
+        }
+
+        .login-input:focus {
+            border-color: #00e5ff;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* BOTÓN AJUSTADO - TAMAÑO PERFECTO */
+        .login-btn {
+            width: 130px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #00e5ff, #7c3aed);
+            border: none;
+            border-radius: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #0a0f1f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 229, 255, 0.3);
+            background: linear-gradient(135deg, #1ee8ff, #8b5cf6);
+        }
+
+        .error-msg {
+            color: #e05a5a;
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        /* Panel Admin */
+        .admin-panel-container {
+            display: none;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px 30px;
+            background: rgba(10, 18, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo i {
+            font-size: 45px;
+            background: linear-gradient(135deg, #00e5ff, #f5c542);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, #ffffff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn-volver, .btn-logout {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: #00e5ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .filtros-card {
+            background: rgba(10, 18, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 48px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .filtros-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filtro-select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            border-radius: 40px;
+            padding: 10px 20px;
+            color: #e8e8f0;
+            cursor: pointer;
+        }
+
+        .btn-excel {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #e05a5a, #c0392b);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .resumen-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .resumen-item {
+            background: rgba(10, 18, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .resumen-item i {
+            font-size: 45px;
+            background: linear-gradient(135deg, #00e5ff, #f5c542);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .resumen-item .valor {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .graficas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .grafica-card {
+            background: rgba(10, 18, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .grafica-header {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(124, 58, 237, 0.05));
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .grafica-header i {
+            font-size: 28px;
+            color: #00e5ff;
+        }
+
+        .grafica-header h3 {
+            font-size: 20px;
+            background: linear-gradient(135deg, #ffffff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .grafica-body {
+            padding: 25px;
+        }
+
+        canvas {
+            max-height: 300px;
+            width: 100%;
+        }
+
+        .tabla-card {
+            background: rgba(10, 18, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border-radius: 32px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            overflow: hidden;
+        }
+
+        .tabla-header {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(124, 58, 237, 0.05));
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tabla-header i {
+            font-size: 28px;
+            color: #00e5ff;
+        }
+
+        .tabla-header h3 {
+            font-size: 20px;
+            background: linear-gradient(135deg, #ffffff, #00e5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .tabla-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        th {
+            color: #00e5ff;
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .admin-panel-container { padding: 15px; }
+            .graficas-grid { grid-template-columns: 1fr; }
+            .resumen-item .valor { font-size: 28px; }
+            .login-btn { width: 120px; padding: 8px 16px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+<div id="loginScreen" class="login-container">
+    <div class="login-card">
+        <i class="fas fa-shield-alt"></i>
+        <h2>Admin TECNOUNIA</h2>
+        <p>Panel de control futurista</p>
+        <input type="text" id="username" class="login-input" placeholder="Usuario" autocomplete="off">
+        <input type="password" id="password" class="login-input" placeholder="Contraseña">
+        <button class="login-btn" id="loginBtn"><i class="fas fa-arrow-right"></i> Ingresar</button>
+        <div id="errorMsg" class="error-msg">Acceso denegado</div>
+    </div>
+</div>
+
+<div id="adminPanel" class="admin-panel-container">
+    <div class="admin-header">
+        <div class="logo">
+            <i class="fas fa-microchip"></i>
+            <div>
+                <h1>TECNOUNIA ADMIN</h1>
+                <p>Panel de control · Estadísticas en tiempo real</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="https://courageous-stardust-9716ee.netlify.app" class="btn-volver" target="_blank"><i class="fas fa-external-link-alt"></i> Ver página</a>
+            <button class="btn-logout" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Salir</button>
+        </div>
+    </div>
+
+    <div class="filtros-card">
+        <div class="filtros-group">
+            <label><i class="fas fa-calendar-alt"></i> Filtrar:</label>
+            <select id="mesFilter" class="filtro-select"><option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option><option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option><option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option><option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option></select>
+            <select id="anioFilter" class="filtro-select"><option value="2025">2025</option><option value="2026">2026</option></select>
+        </div>
+        <div class="filtros-group">
+            <button class="btn-excel" id="exportarBtn"><i class="fas fa-file-excel"></i> Exportar</button>
+            <button class="btn-reset" id="resetearBtn"><i class="fas fa-trash-alt"></i> Resetear</button>
+        </div>
+    </div>
+
+    <div class="resumen-card">
+        <div class="resumen-item"><i class="fas fa-chart-line"></i><h4>Total clics</h4><div class="valor" id="totalClics">0</div></div>
+        <div class="resumen-item"><i class="fas fa-trophy"></i><h4>Más usado</h4><div class="valor" id="servicioTop">-</div></div>
+        <div class="resumen-item"><i class="fas fa-users"></i><h4>Perfil activo</h4><div class="valor" id="perfilTop">-</div></div>
+    </div>
+
+    <div class="graficas-grid">
+        <div class="grafica-card"><div class="grafica-header"><i class="fas fa-chart-bar"></i><h3>Uso por perfil</h3></div><div class="grafica-body"><canvas id="perfilChart"></canvas></div></div>
+        <div class="grafica-card"><div class="grafica-header"><i class="fas fa-chart-pie"></i><h3>Top 5 herramientas</h3></div><div class="grafica-body"><canvas id="serviciosChart"></canvas></div></div>
+    </div>
+
+    <div class="tabla-card">
+        <div class="tabla-header"><i class="fas fa-table"></i><h3>Detalle de clics</h3></div>
+        <div class="tabla-wrapper">
+            <table id="detalleTabla"><thead><tr><th>Servicio</th><th>Estudiante</th><th>Profesor</th><th>Administrativo</th><th>Egresado</th><th>Total</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const USUARIO_CORRECTO = "admin";
+    const CONTRASENA_CORRECTA = "tecnounia2025";
+
+    const serviciosConfig = [
+        { nombre: "CREDU", perfilesPermitidos: ["profesor"] },
+        { nombre: "AULA TECH", perfilesPermitidos: ["profesor", "administrativo"] },
+        { nombre: "CYBER CONTROL BIBLIOTECA", perfilesPermitidos: ["administrativo"] },
+        { nombre: "CAMPUS DEPLOY", perfilesPermitidos: ["administrativo"] },
+        { nombre: "PROCESADOR DIAN XML", perfilesPermitidos: ["administrativo"] },
+        { nombre: "WEB CALEX", perfilesPermitidos: ["profesor"] },
+        { nombre: "CSU", perfilesPermitidos: ["egresado"] }
+    ];
+    const perfiles = ["estudiante", "profesor", "administrativo", "egresado"];
+    let estadisticasMensuales = {};
+    let perfilChart, serviciosChart;
+
+    function inicializarDatos() {
+        let guardado = localStorage.getItem("tecnounia_estadisticas_mensuales_v2");
+        if (guardado) estadisticasMensuales = JSON.parse(guardado);
+        else {
+            [2025, 2026].forEach(año => {
+                [0,1,2,3,4,5,6,7,8,9,10,11].forEach(mes => {
+                    serviciosConfig.forEach(servicio => {
+                        if (!estadisticasMensuales[servicio.nombre]) estadisticasMensuales[servicio.nombre] = {};
+                        perfiles.forEach(perfil => {
+                            if (!estadisticasMensuales[servicio.nombre][perfil]) estadisticasMensuales[servicio.nombre][perfil] = {};
+                            if (!estadisticasMensuales[servicio.nombre][perfil][año]) estadisticasMensuales[servicio.nombre][perfil][año] = {};
+                            estadisticasMensuales[servicio.nombre][perfil][año][mes] = 0;
+                        });
+                    });
+                });
+            });
+        }
+        guardarDatos();
+    }
+
+    function guardarDatos() { localStorage.setItem("tecnounia_estadisticas_mensuales_v2", JSON.stringify(estadisticasMensuales)); }
+
+    function obtenerDatosFiltrados(mes, año) {
+        let resultado = { porServicio: {}, porPerfil: { estudiante: 0, profesor: 0, administrativo: 0, egresado: 0 }, total: 0 };
+        serviciosConfig.forEach(s => resultado.porServicio[s.nombre] = 0);
+        serviciosConfig.forEach(servicio => {
+            perfiles.forEach(perfil => {
+                let valor = estadisticasMensuales[servicio.nombre]?.[perfil]?.[año]?.[mes] || 0;
+                resultado.porServicio[servicio.nombre] += valor;
+                resultado.porPerfil[perfil] += valor;
+                resultado.total += valor;
+            });
+        });
+        return resultado;
+    }
+
+    function cargarEstadisticas() {
+        let mes = parseInt(document.getElementById('mesFilter').value);
+        let año = parseInt(document.getElementById('anioFilter').value);
+        let datos = obtenerDatosFiltrados(mes, año);
+        document.getElementById('totalClics').innerText = datos.total;
+        let servicioTop = Object.entries(datos.porServicio).sort((a,b) => b[1] - a[1])[0];
+        document.getElementById('servicioTop').innerText = servicioTop && servicioTop[1] > 0 ? `${servicioTop[0]} (${servicioTop[1]})` : "Sin datos";
+        let perfilTop = Object.entries(datos.porPerfil).sort((a,b) => b[1] - a[1])[0];
+        let nombres = {estudiante:"Estudiante", profesor:"Profesor", administrativo:"Administrativo", egresado:"Egresado"};
+        document.getElementById('perfilTop').innerText = perfilTop && perfilTop[1] > 0 ? `${nombres[perfilTop[0]]} (${perfilTop[1]})` : "Sin datos";
+        if (perfilChart) perfilChart.destroy();
+        perfilChart = new Chart(document.getElementById('perfilChart'), {
+            type: 'bar',
+            data: { labels: ['Estudiante', 'Profesor', 'Administrativo', 'Egresado'],
+                    datasets: [{ label: 'Clics', data: [datos.porPerfil.estudiante, datos.porPerfil.profesor, datos.porPerfil.administrativo, datos.porPerfil.egresado],
+                                backgroundColor: 'rgba(0, 229, 255, 0.7)', borderColor: '#00e5ff', borderRadius: 8 }] },
+            options: { responsive: true, plugins: { legend: { labels: { color: '#e8e8f0' } } },
+                       scales: { y: { ticks: { color: '#e8e8f0' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+                                 x: { ticks: { color: '#e8e8f0' }, grid: { display: false } } } }
+        });
+        let topServicios = Object.entries(datos.porServicio).sort((a,b) => b[1] - a[1]).slice(0,5);
+        if (serviciosChart) serviciosChart.destroy();
+        serviciosChart = new Chart(document.getElementById('serviciosChart'), {
+            type: 'pie',
+            data: { labels: topServicios.map(s => s[0]), datasets: [{ data: topServicios.map(s => s[1]), backgroundColor: ['#00e5ff', '#f5c542', '#7c3aed', '#10b981', '#e05a5a'] }] },
+            options: { responsive: true, plugins: { legend: { labels: { color: '#e8e8f0' } } } }
+        });
+        let tbody = document.querySelector('#detalleTabla tbody');
+        tbody.innerHTML = '';
+        serviciosConfig.forEach(servicio => {
+            let total = datos.porServicio[servicio.nombre];
+            let row = tbody.insertRow();
+            row.insertCell(0).innerHTML = `<strong>${servicio.nombre}</strong>`;
+            perfiles.forEach(perfil => {
+                let valor = estadisticasMensuales[servicio.nombre]?.[perfil]?.[año]?.[mes] || 0;
+                let esPermitido = servicio.perfilesPermitidos.includes(perfil);
+                row.insertCell(-1).innerHTML = !esPermitido ? "—" : valor;
+            });
+            row.insertCell(-1).innerHTML = `<strong style="color:#00e5ff">${total}</strong>`;
+        });
+    }
+
+    function exportarExcel() {
+        let mes = parseInt(document.getElementById('mesFilter').value);
+        let año = parseInt(document.getElementById('anioFilter').value);
+        let datos = obtenerDatosFiltrados(mes, año);
+        let csv = "Servicio,Estudiante,Profesor,Administrativo,Egresado,Total\n";
+        serviciosConfig.forEach(s => {
+            csv += `${s.nombre},${estadisticasMensuales[s.nombre]?.estudiante?.[año]?.[mes] || 0},${estadisticasMensuales[s.nombre]?.profesor?.[año]?.[mes] || 0},${estadisticasMensuales[s.nombre]?.administrativo?.[año]?.[mes] || 0},${estadisticasMensuales[s.nombre]?.egresado?.[año]?.[mes] || 0},${datos.porServicio[s.nombre]}\n`;
+        });
+        csv += `\nTotales,${datos.porPerfil.estudiante},${datos.porPerfil.profesor},${datos.porPerfil.administrativo},${datos.porPerfil.egresado},${datos.total}\n`;
+        let link = document.createElement('a');
+        link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+        link.download = `estadisticas_${año}_${mes+1}.csv`;
+        link.click();
+    }
+
+    function resetearTodo() {
+        if (confirm('¿Borrar TODAS las estadísticas?')) {
+            [2025, 2026].forEach(año => {
+                [0,1,2,3,4,5,6,7,8,9,10,11].forEach(mes => {
+                    serviciosConfig.forEach(servicio => {
+                        perfiles.forEach(perfil => {
+                            if (estadisticasMensuales[servicio.nombre]?.[perfil]?.[año]) estadisticasMensuales[servicio.nombre][perfil][año][mes] = 0;
+                        });
+                    });
+                });
+            });
+            guardarDatos();
+            cargarEstadisticas();
+            alert('Estadísticas reseteadas');
+        }
+    }
+
+    function validarLogin() {
+        let user = document.getElementById('username').value;
+        let pass = document.getElementById('password').value;
+        if (user === USUARIO_CORRECTO && pass === CONTRASENA_CORRECTA) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            inicializarDatos();
+            cargarEstadisticas();
+        } else {
+            document.getElementById('errorMsg').style.display = 'block';
+            setTimeout(() => document.getElementById('errorMsg').style.display = 'none', 3000);
+        }
+    }
+
+    function logout() {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', validarLogin);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+    document.getElementById('exportarBtn').addEventListener('click', exportarExcel);
+    document.getElementById('resetearBtn').addEventListener('click', resetearTodo);
+    document.getElementById('mesFilter').addEventListener('change', cargarEstadisticas);
+    document.getElementById('anioFilter').addEventListener('change', cargarEstadisticas);
+    document.getElementById('username').addEventListener('keypress', function(e) { if (e.key === 'Enter') validarLogin(); });
+    document.getElementById('password').addEventListener('keypress', function(e) { if (e.key === 'Enter') validarLogin(); });
+</script>
+</body>
+</html>
